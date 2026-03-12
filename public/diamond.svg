@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" id="diamond">
+  <path fill="#DF5DFF" d="m12 21 7-9-7-9-7 9 7 9Z"></path>
+  <path fill="#B029D1" d="m12 21 3-9-3-9 7 9-7 9Z"></path>
+  <path fill="#EDA3FF" d="m12 21-3-9 3-9-7 9 7 9Z"></path>
+</svg>

@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String
+  name      String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // User stats (single source of truth)
+  balance       Int @default(0)
+  currentStreak Int @default(0)
+  longestStreak Int @default(0)
+  totalEarned   Int @default(0)
+  totalSpent    Int @default(0)
+
+  // Relations
+  tasks     Task[]
+  rewards   Reward[]
+  spendLogs SpendLog[]
+}
+
+model Task {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  category  String
+  type      String   // "habit" | "daily" | "todo"
+  reward    Int
+  count     Int      @default(0)
+  completed Boolean  @default(false)
+  archived  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  userId  String   @db.ObjectId
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history TaskHistory[]
+}
+
+model TaskHistory {
+  id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  credits Int
+  date    DateTime @default(now())
+
+  // Relations
+  taskId String @db.ObjectId
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Reward {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  icon        String   @default("Gift")
+  cost        Int
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  userId    String     @db.ObjectId
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  spendLogs SpendLog[]
+}
+
+model SpendLog {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  creditsSpent Int
+  date         DateTime @default(now())
+
+  // Relations
+  userId   String @db.ObjectId
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rewardId String @db.ObjectId
+  reward   Reward @relation(fields: [rewardId], references: [id], onDelete: Cascade)
+}
